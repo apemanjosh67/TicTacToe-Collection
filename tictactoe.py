@@ -1,3 +1,9 @@
+#Josh Muszka
+#January 29, 2021
+#Last updated: January 31, 2021
+#TicTacToe program--left click to place an X, right click to place an O
+#has turns, scoring, and game-ending (including draws)
+
 import pygame, sys, time
 
 pygame.init()
@@ -19,6 +25,7 @@ XX = 1
 OO = -1
 isPlayerTurn = True #take turns between player and computer
 game_won = False
+draw_flag = 6 #returns this value if game is a draw (if no winner yet no empty squares remain)
 
 #colors
 background_color = 0xFF, 0xE5, 0xAB 
@@ -27,6 +34,7 @@ line_color = 0x6E, 0x1D, 0x1D
 def check_score():
 
     win_check = 0
+    global game_won
     #check for vertical winner
     for i in range(GRID):
         for j in range(GRID):
@@ -60,6 +68,7 @@ def check_score():
         if win_check == GRID*OO:
             game_won = True
             return win_check
+    win_check = 0
 
     #check diagonal topright-bottomleft winner
     for i in range(GRID):
@@ -71,28 +80,37 @@ def check_score():
             game_won = True
             return win_check
 
+    #check for empty square
+    for i in range(GRID):
+        for j in range(GRID):
+            if board[i][j] == 0:
+                return
+    game_won = True
+    return draw_flag
+    
 
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            left, middle, right = pygame.mouse.get_pressed()
-            if left:
-                x,y = pygame.mouse.get_pos()
-                x = int((x/width)*GRID)
-                y = int((y/height)*GRID)
-                if isPlayerTurn and board[x][y] == 0:
-                    board[x][y] = XX
-                    isPlayerTurn = False
+            if not game_won:
+                left, middle, right = pygame.mouse.get_pressed()
+                if left:
+                    x,y = pygame.mouse.get_pos()
+                    x = int((x/width)*GRID)
+                    y = int((y/height)*GRID)
+                    if isPlayerTurn and board[x][y] == 0:
+                        board[x][y] = XX
+                        isPlayerTurn = False
 
-            if right:
-                x,y = pygame.mouse.get_pos()
-                x = int((x/width)*GRID)
-                y = int((y/height)*GRID)
-                if not isPlayerTurn and board[x][y] == 0:
-                    board[x][y] = OO
-                    isPlayerTurn = True
+                if right:
+                    x,y = pygame.mouse.get_pos()
+                    x = int((x/width)*GRID)
+                    y = int((y/height)*GRID)
+                    if not isPlayerTurn and board[x][y] == 0:
+                        board[x][y] = OO
+                        isPlayerTurn = True
 
 
     screen.fill(background_color)
@@ -104,10 +122,11 @@ while 1:
     pygame.draw.line(screen, line_color, (0, height-2), (width-2, height-2), 4)
 
     #set window title status
-    if isPlayerTurn:
-        pygame.display.set_caption("Player Turn!")
-    else:
-        pygame.display.set_caption("Computer Turn!")
+    if not game_won:
+        if isPlayerTurn:
+            pygame.display.set_caption("Player Turn!")
+        else:
+            pygame.display.set_caption("Computer Turn!")
 
     for i in range(GRID):
         for j in range(GRID):
@@ -140,6 +159,8 @@ while 1:
         pygame.display.set_caption("Player wins")
     if check_score() == OO*GRID:
         pygame.display.set_caption("Computer wins")
+    if check_score() == draw_flag:
+        pygame.display.set_caption("Draw")
 
     time.sleep(1/FPS)
     pygame.display.update()
