@@ -98,6 +98,8 @@ def computerTurn():
     #if player has a chance to win, place O
     #else, place random O
 
+    #check for computer victory
+
     check_board = 0
     #horizontally
     for i in range(GRID):
@@ -106,12 +108,6 @@ def computerTurn():
         
         #if there is one empty space in row
         if check_board == (GRID-1)*OO:
-            for j in range (GRID):
-                #check to see which space is the empty one
-                if board[j][i] == 0:
-                    board[j][i] = OO
-                    return
-        if check_board == (GRID-1)*XX:
             for j in range (GRID):
                 #check to see which space is the empty one
                 if board[j][i] == 0:
@@ -131,23 +127,12 @@ def computerTurn():
                 if board[i][j] == 0:
                     board[i][j] = OO
                     return
-        if check_board == (GRID-1)*XX:
-            for j in range (GRID):
-                #check to see which space is the empty one
-                if board[i][j] == 0:
-                    board[i][j] = OO
-                    return
         check_board = 0
 
     #diagonally topleft bottom right
     for i in range(GRID):
         check_board += board[i][i]
     if check_board == (GRID-1)*OO:
-        for i in range(GRID):
-            if board[i][i] == 0:
-                board[i][i] = OO
-                return
-    if check_board == (GRID-1)*XX:
         for i in range(GRID):
             if board[i][i] == 0:
                 board[i][i] = OO
@@ -162,12 +147,59 @@ def computerTurn():
             if board[i][GRID-1-i] == 0:
                 board[i][GRID-1-i] = OO
                 return
+    check_board = 0
+
+
+    #check to prevent player victory
+
+    #horizontally
+    for i in range(GRID):
+        for j in range (GRID):
+            check_board += board[j][i]
+        
+        #if there is one empty space in row
+        if check_board == (GRID-1)*XX:
+            for j in range (GRID):
+                #check to see which space is the empty one
+                if board[j][i] == 0:
+                    board[j][i] = OO
+                    return
+        check_board = 0
+
+    #vertically
+    for i in range(GRID):
+        for j in range (GRID):
+            check_board += board[i][j]
+        
+        #if there is one empty space in row
+        if check_board == (GRID-1)*XX:
+            for j in range (GRID):
+                #check to see which space is the empty one
+                if board[i][j] == 0:
+                    board[i][j] = OO
+                    return
+        check_board = 0
+
+    #diagonally topleft bottom right
+    for i in range(GRID):
+        check_board += board[i][i]
+    if check_board == (GRID-1)*XX:
+        for i in range(GRID):
+            if board[i][i] == 0:
+                board[i][i] = OO
+                return
+    check_board = 0
+
+    #diagonally topright bottomleft
+    for i in range(GRID):
+        check_board += board[i][GRID-1-i]
     if check_board == (GRID-1)*XX:
         for i in range(GRID):
             if board[i][GRID-1-i] == 0:
                 board[i][GRID-1-i] = OO
                 return
     check_board = 0
+
 
     #if there were no other spaces to win / block player from winning
     i = random.randint(0,GRID-1)
