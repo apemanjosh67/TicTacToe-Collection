@@ -17,10 +17,17 @@ size = width, height
 screen = pygame.display.set_mode(size)
 
 #game info
+
 GRID = 3
-board=[] #0 if space hasn't been filled, 1 if filled by x, -1 if filled by 
-for i in range(GRID*GRID):
-    board.append([0,0,0])
+board=[] #0 if space hasn't been filled, 1 if filled by x, -1 if filled by o
+
+#set up board
+for i in range(GRID):
+    row = []
+    for j in range(GRID):
+        row.append(0)
+    board.append(row)
+
 XX = 1
 OO = -1
 isPlayerTurn = True #take turns between player and computer
@@ -269,7 +276,7 @@ while 1:
             if board[i][j] == OO:
                 x = i+1
                 y = j+1
-                pygame.draw.circle(screen, line_color, ((width/GRID)*i + width/6,(height/GRID)*j + height/6), width/6, 6)
+                pygame.draw.circle(screen, line_color, ((width/GRID)*i + width/GRID/2,(height/GRID)*j + height/GRID/2), width/GRID/2, 6)
 
     if check_score() == XX*GRID:
         pygame.display.set_caption("Player wins")
