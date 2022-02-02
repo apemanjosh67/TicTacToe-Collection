@@ -1,10 +1,10 @@
 #Josh Muszka
 #January 29, 2021
-#Last updated: January 31, 2021
-#TicTacToe program--left click to place an X, right click to place an O
-#has turns, scoring, and game-ending (including draws)
+#Last updated: February 1, 2021
+#TicTacToe program--left click to place an X
+#has turns, scoring, and game-ending (including draws), and computer AI
 
-import pygame, sys, time
+import pygame, sys, time, random
 
 pygame.init()
 
@@ -26,6 +26,9 @@ OO = -1
 isPlayerTurn = True #take turns between player and computer
 game_won = False
 draw_flag = 6 #returns this value if game is a draw (if no winner yet no empty squares remain)
+prev_time = time.time()
+current_time = time.time()
+
 
 #colors
 background_color = 0xFF, 0xE5, 0xAB 
@@ -88,6 +91,95 @@ def check_score():
     game_won = True
     return draw_flag
     
+def computerTurn():
+
+    #scan board
+    #if computer has a chance to win, place O
+    #if player has a chance to win, place O
+    #else, place random O
+
+    check_board = 0
+    #horizontally
+    for i in range(GRID):
+        for j in range (GRID):
+            check_board += board[j][i]
+        
+        #if there is one empty space in row
+        if check_board == (GRID-1)*OO:
+            for j in range (GRID):
+                #check to see which space is the empty one
+                if board[j][i] == 0:
+                    board[j][i] = OO
+                    return
+        if check_board == (GRID-1)*XX:
+            for j in range (GRID):
+                #check to see which space is the empty one
+                if board[j][i] == 0:
+                    board[j][i] = OO
+                    return
+        check_board = 0
+
+    #vertically
+    for i in range(GRID):
+        for j in range (GRID):
+            check_board += board[i][j]
+        
+        #if there is one empty space in row
+        if check_board == (GRID-1)*OO:
+            for j in range (GRID):
+                #check to see which space is the empty one
+                if board[i][j] == 0:
+                    board[i][j] = OO
+                    return
+        if check_board == (GRID-1)*XX:
+            for j in range (GRID):
+                #check to see which space is the empty one
+                if board[i][j] == 0:
+                    board[i][j] = OO
+                    return
+        check_board = 0
+
+    #diagonally topleft bottom right
+    for i in range(GRID):
+        check_board += board[i][i]
+    if check_board == (GRID-1)*OO:
+        for i in range(GRID):
+            if board[i][i] == 0:
+                board[i][i] = OO
+                return
+    if check_board == (GRID-1)*XX:
+        for i in range(GRID):
+            if board[i][i] == 0:
+                board[i][i] = OO
+                return
+    check_board = 0
+
+    #diagonally topright bottomleft
+    for i in range(GRID):
+        check_board += board[i][GRID-1-i]
+    if check_board == (GRID-1)*OO:
+        for i in range(GRID):
+            if board[i][GRID-1-i] == 0:
+                board[i][GRID-1-i] = OO
+                return
+    if check_board == (GRID-1)*XX:
+        for i in range(GRID):
+            if board[i][GRID-1-i] == 0:
+                board[i][GRID-1-i] = OO
+                return
+    check_board = 0
+
+    #if there were no other spaces to win / block player from winning
+    i = random.randint(0,GRID-1)
+    j = random.randint(0,GRID-1)
+    while board[i][j] != 0:
+        i = random.randint(0,GRID-1)
+        j = random.randint(0,GRID-1)
+    board[i][j] = OO
+    return
+
+def random_wait_time():
+    return random.uniform(1.0,3.0)
 
 while 1:
     for event in pygame.event.get():
@@ -103,15 +195,7 @@ while 1:
                     if isPlayerTurn and board[x][y] == 0:
                         board[x][y] = XX
                         isPlayerTurn = False
-
-                if right:
-                    x,y = pygame.mouse.get_pos()
-                    x = int((x/width)*GRID)
-                    y = int((y/height)*GRID)
-                    if not isPlayerTurn and board[x][y] == 0:
-                        board[x][y] = OO
-                        isPlayerTurn = True
-
+                    prev_time = time.time()
 
     screen.fill(background_color)
 
@@ -161,6 +245,13 @@ while 1:
         pygame.display.set_caption("Computer wins")
     if check_score() == draw_flag:
         pygame.display.set_caption("Draw")
+
+    #computer turn
+    if not isPlayerTurn and not game_won:
+        current_time = time.time()
+        if current_time - prev_time > random_wait_time():
+            computerTurn()
+            isPlayerTurn = True
 
     time.sleep(1/FPS)
     pygame.display.update()
